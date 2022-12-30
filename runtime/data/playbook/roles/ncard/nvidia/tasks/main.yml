@@ -1,0 +1,90 @@
+---
+- name: yum isntall lspci
+  yum:
+    name: "pciutils"
+    state: "present"
+  when: ansible_distribution == 'CentOS'
+
+- name: Is Install nvidia
+  shell: nvidia-smi |grep "Driver Version:" |wc -l
+  register: IS_NVIDIA_INSTALL
+
+- name: get nVidia drive status
+  shell: sudo lspci |grep -i 'VGA'|wc -l
+  register: NVIDIA_STATE
+- name:  print nVidia drive status
+  debug: msg={{ NVIDIA_STATE['stdout'] }}
+- block:
+  - name: ubuntu install depend
+    include_tasks: install-ubuntu.yml
+    when: ansible_distribution == 'Ubuntu'
+
+  - name: centos install package
+    include_tasks: install-centos.yml
+    when: ansible_distribution == 'CentOS'
+
+  - name: Create base directory
+    file: name={{ item }} state=directory
+    with_items:
+      - "{{ base_dir }}"
+
+  - name: "Check nvidia package"
+    stat:
+      path: "{{ base_dir }}/{{ nvidia_name }}-{{ nvidia }}.run"
+    register: check_nvidia_package
+
+  - name: "Check nvidia driver  download"
+    set_fact:
+      nvidia_package_download: "{{ check_nvidia_package.stat.exists }}"
+
+  - name: download nvidia drive binaries
+    get_url:
+      validate_certs: no
+      url: "{{ nvidia_download_url }}"
+      dest: "{{ base_dir }}/"
+      timeout: "{{ download_timeout_online }}"
+    when: not nvidia_package_download
+
+  - name: delete nouveau
+    modprobe: name=nouveau   state=absent
+    ignore_errors: True
+
+  - name: add blacklist.conf
+    blockinfile:
+      path: /etc/modprobe.d/blacklist.conf
+      block: |
+        blacklist rivafb
+        blacklist vga16fb
+        blacklist nouveau
+        blacklist nvidiafb
+        blacklist rivatv
+        options nouveau modeset=0
+        blacklist lbm-nouveau
+        alias nouveau off
+        alias lbm-nouveau off
+      marker: "# {mark} ANSIBLE MANAGED BLOCK"
+
+  - name: run update-initramfs -u
+    shell: echo options nouveau modeset=0 | sudo tee -a /etc/modprobe.d/nouveau-kms.conf && update-initramfs -u
+    when: ansible_distribution == 'Ubuntu'
+
+  - name: run NVIDIA-Linux-x86_64-460.91.03.run
+    shell:
+      cmd: "bash {{ base_dir }}/{{ nvidia_name }}-{{ nvidia }}.run --accept-license --silent --no-nouveau-check --disable-nouveau --no-opengl-files &&  touch /tmp/install-nvidia-ok || touch /tmp/install-nvidia-err"
+      creates: /tmp/install-nvidia-ok
+
+  - name: reboot server
+    reboot:
+      test_command: uptime
+      reboot_timeout: 3600
+
+  - name: Check the smi of the servers
+    shell: "nvidia-smi"
+    register: smi
+
+  - debug: var=smi
+  when: NVIDIA_STATE['stdout'] != "0" and IS_NVIDIA_INSTALL['stdout'] == "0"
+
+- name: get nvidia install status
+  shell: sudo nvidia-smi |grep {{ nvidia }} |wc -l
+  register: NVIDIA_STATE

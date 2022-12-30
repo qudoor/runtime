@@ -1,0 +1,52 @@
+- name: Ubuntu install qutrunk
+  include_tasks: install-ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Centos install qutrunk
+  include_tasks: install-centos.yml
+  when: ansible_distribution == 'CentOS'
+
+- name: "Check qusprout package"
+  stat:
+    path: "{{ base_dir }}/{{ qusprout_package }}"
+  register: check_qusprout_package
+
+- name: "Determine if qusprout package is download"
+  set_fact:
+    qusprout_package_download: "{{ check_qusprout_package.stat.exists }}"
+
+- name: Download qusprout package
+  get_url:
+    validate_certs: no
+    url: "{{ qusprout_download_url }}"
+    dest: "{{ base_dir }}/"
+    timeout: "{{ download_timeout_online }}"
+  when: not qusprout_package_download
+
+- name: Unarchive qusprout package
+  unarchive:
+    src: "{{ base_dir }}/{{ qusprout_package }}"
+    dest: "{{ base_dir }}"
+    remote_src: yes
+
+- name: Install thirdparyt package
+  shell:
+    "bash install.sh"
+  args:
+    chdir: "{{ base_dir }}/qusprout/thirdparty/"
+
+- name: Build qusprout
+  shell:
+    "bash build_qusprout.sh version {{ qusprout_version }}"
+  args:
+    chdir: "{{ base_dir }}/qusprout/"
+    executable: /bin/bash
+
+- name: Deploy qusprout
+  shell:
+    "bash service_qusprout.sh version {{ qusprout_version }}"
+  args:
+    chdir: "{{ base_dir }}/qusprout/"
+    executable: /bin/bash
+
+

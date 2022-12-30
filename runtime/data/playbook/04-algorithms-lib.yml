@@ -1,0 +1,10 @@
+- hosts:
+  - qupot-master
+  - qupot-worker
+  - new-worker
+  roles:
+  - prepare/repository
+  - prepare/base
+  - prepare/nameserver
+  - prepare/python
+  - algorithms-lib

@@ -1,0 +1,15 @@
+- name: install centos
+  yum:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - perl-Data-Dumper
+    - python-devel
+    - python3-devel
+    - gcc
+    - gcc-c++
+    - make
+    - unzip
+#    - autoconf
+
+

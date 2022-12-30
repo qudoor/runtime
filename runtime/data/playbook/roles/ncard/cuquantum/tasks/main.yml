@@ -1,0 +1,7 @@
+- name: ubuntu install cuquantum
+  include_tasks: install-ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+
+- name: centos install cuquantum
+  include_tasks: install-centos.yml
+  when: ansible_distribution == 'CentOS'

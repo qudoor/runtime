@@ -1,0 +1,55 @@
+# docker 仓库地址
+qupot_repository_hostname: "registry.quantum-door.com"
+# ----------------------- 主机名称样式(ip,hostname) --------------------
+cluster_name_style: "{% if hostvars[inventory_hostname]['ansible_ssh_host'] is defined %}hostname{% else %}ip{% endif %}"
+
+# Binaries Directory
+bin_dir: "/usr/local/bin"
+# 存放目录
+base_dir: "/opt/qupot"
+# 仓库地址
+dns_repository_hostname: "registry.quantum-door.io"
+# 在线模式文件下载超时时间，默认15 min
+download_timeout_online: "900"
+
+nvidia_name: "NVIDIA-Linux-x86_64"
+#cuda包名
+cuda_package: "cuda_{{ cuda }}_{{ nvidia }}_linux.run"
+#anaconda包名
+anaconda_package: "Anaconda3-{{ anaconda }}-Linux-x86_64.sh"
+#anaconda安装路径
+anaconda_dir: "/usr/local/anaconda"
+#虚拟环境
+anaconda_env: "cuquantum_env"
+#python版本
+python_version: "3.9.14"
+#python包
+python_package: "Python-{{ python_version }}.tar.xz"
+#qusprout版本
+qusprout_version: "0.1.12"
+#qusprout_package
+qusprout_package: "Qusprout-{{ qusprout_version }}.tar.gz"
+pcie_qrng_version: "1.1.2"
+pcie_qrng_name: "QRNG-PCIE-{{ pcie_qrng_version }}-Lylin"
+pcie_qrng_package: "{{ pcie_qrng_name }}.zip"
+#quqcs
+quqcs_package: "quqcs-{{ quqcs_version }}-py3-none-any.whl"
+quqcs_version: "0.1.0"
+
+
+# ----------------------- nvidia 驱动 下载地址 --------------------
+nvidia_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-raw/nvidia/{{ nvidia }}/{{ architectures }}/{{ nvidia_name }}-{{ nvidia }}.run"
+# ----------------------- cuda  下载地址 --------------------
+cuda_repo_key_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-raw/cuda/{{ cuda }}/{{ architectures }}/{{ cuda_apt_key }}"
+cuda_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-raw/cuda/{{ cuda }}/{{ architectures }}/{{ cuda_package }}"
+cuda_repo_url: "deb [signed-by={{ base_dir }}/{{ cuda_apt_key }}] {{ registry_protocol }}://{{ registry_hostname }}:{{ repo_port }}/repository/apt-proxy-cuda /"
+# ----------------------- Anaconda3 下载地址 --------------------
+anaconda_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-raw/anaconda/{{ anaconda }}/{{ architectures }}/{{ anaconda_package }}"
+# ----------------------- python3 下载地址 --------------------
+python_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-raw/python/{{ python_version }}/{{ python_package }}"
+# ----------------------- Qusprout 下载地址 --------------------
+qusprout_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-raw/qusprout/{{ qusprout_version }}/{{ qusprout_package }}"
+# ----------------------- PCIE-QRNG 下载地址 --------------------
+pcie_qrng_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-raw/pcie-qrng/{{ pcie_qrng_version }}/{{ architectures }}/{{ pcie_qrng_package }}"
+# ----------------------- quqcs 下载地址 --------------------
+quqcs_download_url: "{{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-raw/quqcs/{{ quqcs_version }}/{{ quqcs_package }}"

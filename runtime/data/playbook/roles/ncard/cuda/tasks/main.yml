@@ -1,0 +1,81 @@
+---
+- name: get nvidia install status
+  shell: sudo nvidia-smi |grep {{ nvidia }} |wc -l
+  register: SMI_STATE
+  tags: nvcc
+
+- name:  print nVidia  status
+  debug: msg={{ SMI_STATE['stdout'] }}
+
+- name: "Determine running kernel"
+  command: uname -r
+  register: cuda_driver_kernel_running
+
+- name: "Determine kernel version"
+  set_fact:
+    cuda_driver_kernel_version: "{{ cuda_driver_kernel_version | default(cuda_driver_kernel_running.stdout, true) }}"
+
+- block:
+  - name: "Check NVIDIA kernel module"
+    find:
+      path: "/lib/modules/{{ cuda_driver_kernel_version }}"
+      patterns: nvidia.ko.xz
+      recurse: true
+    register: cuda_driver_kernel_module_find
+
+  - name: "Check CUDA toolkit path"
+    stat:
+      path: /usr/local/cuda
+    register: cuda_toolkit_path
+
+  - name: "Check cuda package"
+    stat:
+      path: "{{ base_dir }}/{{ cuda_package }}"
+    register: check_cuda_package
+
+  - name: "Determine if driver and toolkit are installed"
+    set_fact:
+      cuda_driver_installed: "{{ cuda_driver_kernel_module_find.matched > 0 }}"
+      cuda_toolkit_installed: "{{ cuda_toolkit_path.stat.exists }}"
+      cuda_package_download: "{{ check_cuda_package.stat.exists }}"
+
+  - name: download cuda package
+    get_url:
+      validate_certs: no
+      url: "{{ cuda_download_url }}"
+      dest: "{{ base_dir }}/"
+      timeout: "{{ download_timeout_online }}"
+    when: not cuda_package_download
+
+  - name: "Run installer for toolkit"
+    command: bash {{ base_dir }}/{{ cuda_package }} --silent --toolkit
+    when: not cuda_toolkit_installed
+
+  - name: add cuda environment variable
+    blockinfile:
+      path: /etc/profile
+      block: |
+        export PATH="/usr/local/cuda/bin:$PATH"
+        export LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"
+      marker: "# {mark} ANSIBLE CUDA BLOCK"
+
+  - name: "Run source /etc/profile"
+    shell: source /etc/profile
+    args:
+      executable: /bin/bash
+
+  - name: "Run nvcc -V"
+    shell: /usr/local/cuda/bin/nvcc -V
+    args:
+      executable: /bin/bash
+    register: cuda_toolkit_install_out
+    tags: nvcc
+
+  - name: "print nvcc output"
+    debug:
+      msg: "{{ cuda_toolkit_install_out }}"
+
+  when: SMI_STATE['stdout'] != "0"
+
+
+

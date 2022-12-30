@@ -1,0 +1,82 @@
+---
+- name: "Check  anaconda_dir path"
+  stat:
+    path: "{{ anaconda_dir }}"
+  register: anaconda_path
+
+- name: "Check anaconda install package download"
+  stat:
+    path: "{{ base_dir }}/{{ anaconda_package }}"
+  register: is_anaconda_package
+
+- block:
+  - name: download anaconda install package
+    get_url:
+      validate_certs: no
+      url: "{{ anaconda_download_url }}"
+      dest: "{{ base_dir }}/"
+      timeout: "{{ download_timeout_online }}"
+    when: not is_anaconda_package.stat.exists
+
+  - name: "Run installer for anaconda"
+    command: bash {{ base_dir }}/{{ anaconda_package }} -b -p {{ anaconda_dir }}
+
+  - name: "init connda env"
+    shell: "{{ anaconda_dir }}/bin/conda init $(echo $SHELL | awk -F '/' '{print $NF}')"
+
+  - name: add anaconda environment variable
+    blockinfile:
+      path: /etc/profile
+      block: |
+        export PATH="{{ anaconda_dir }}/bin:$PATH"
+      marker: "# {mark} ANSIBLE anaconda BLOCK"
+
+  - name: "Run source /etc/profile"
+    shell: source /etc/profile
+    args:
+      executable: /bin/bash
+
+  when: not anaconda_path.stat.exists
+
+- name: "create connda env"
+  shell: "{{ anaconda_dir }}/bin/conda create --name {{ anaconda_env }} -y"
+
+- name: "load env"
+  shell: source activate {{ anaconda_env }}
+  args:
+    chdir: "{{ anaconda_dir }}/bin"
+    executable: /bin/bash
+
+- name: "set conda log level"
+  shell: "{{ anaconda_dir }}/bin/conda config --set verbosity 1 --env"
+  args:
+    executable: /bin/bash
+
+- name: "set conda qinghua image"
+  shell: "{{ anaconda_dir }}/bin/conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/conda-forge/"
+  args:
+    executable: /bin/bash
+
+- name: "install cuquantum-python"
+  shell: "{{ anaconda_dir }}/bin/conda install -c conda-forge cuquantum-python -y --show-channel-urls "
+  args:
+    executable: /bin/bash
+
+
+- name: add cuda environment variable
+  blockinfile:
+    path: /etc/profile
+    block: |
+      export CUQUANTUM_ROOT={{ anaconda_dir }}}/envs/{{ anaconda_env }}
+      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${CUQUANTUM_ROOT}/lib
+    marker: "# {mark} ANSIBLE cuquantum BLOCK"
+
+- name: "Run source /etc/profile"
+  shell: source /etc/profile
+  args:
+    executable: /bin/bash
+
+
+
+
+

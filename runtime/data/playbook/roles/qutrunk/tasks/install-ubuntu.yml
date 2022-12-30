@@ -1,0 +1,15 @@
+- name: run qutrunk install packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - python3-pip
+
+- name: run pip install qutrunk packages
+  pip:
+    name: "{{ item }}"
+    extra_args: -i {{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-pypi/simple/ --trusted-host {{ dns_repository_hostname }}
+    executable: pip3
+    virtualenv_python: python3
+  with_items:
+    - qutrunk
