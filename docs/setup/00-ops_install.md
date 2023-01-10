@@ -72,7 +72,7 @@
 
 ## 准备
 * 准备一台不小于2核4G，硬盘不小于40G的64位Linux主机
-* 通过[官网](http://nexus.queco.cn/repository/qudoor-raw/runtime/0.0.1/runtime_v0.0.1_1223_amd64.tar.gz)下载完整安装包到服务器上，使用root执行文件夹里INSTALL.sh安装脚本
+* 通过[官网](http://developer.queco.cn/download/list)的 `Runtime` 下载链接，下载完整安装包到服务器上，使用root执行文件夹里INSTALL.sh安装脚本
 
     ```shell
     # 解压安装包
