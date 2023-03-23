@@ -1,0 +1,38 @@
+version: '3'
+
+vars:
+
+  GIT_COMMIT:
+    sh: git log -n 1 --format=%h
+  VERSION: "v1.1.0-{{.GIT_COMMIT}}"
+  REGISTRY: registry.queco.cn
+  IMAGE_NAME:  "{{ .REGISTRY }}/repository/qudoor/qupot:{{ .VERSION }}-{{if eq ARCH \"arm64\"}}arm64{{else}}amd64{{end}}"
+
+tasks:
+  build:
+    cmds:
+      - echo '{{ .VERSION }}'
+
+  record_version:
+    cmds:
+      - echo '{{ .VERSION }}'
+
+  docker_build:
+    cmds:
+      - task: record_version
+      - echo "build qupot docker version:" {{ .VERSION }}
+      - docker build -t {{ .IMAGE_NAME }} . --build-arg PYARCH={{if eq ARCH "arm64"}}arm64{{else}}amd64{{end}}
+
+  docker_login:
+    vars:
+      USER: "admin"
+      PASSWORD: "'123456'"
+    cmds:
+      - echo "docker login:" {{ .USER }}
+      - docker login {{ .REGISTRY }} -u {{ .USER }} -p {{ .PASSWORD }}
+
+
+  docker_push:
+    cmds:
+      - docker push {{ .IMAGE_NAME }}
+      - echo "push {{ .IMAGE_NAME }}  complete"

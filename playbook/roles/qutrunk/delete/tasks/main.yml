@@ -1,0 +1,8 @@
+- name: "{{ task_name }}"
+  kubernetes.core.helm:
+    name: qutrunk-{{ qutrunk_id }}
+    binary_path: "{{ helm_binary_path }}"
+    kubeconfig: "{{ kubeconfig_file }}"
+    state: absent
+    release_namespace: "{{ kubernetes_qutrunk_namespace }}"
+    wait: true

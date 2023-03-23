@@ -1,0 +1,33 @@
+- name: Add helm repo
+  kubernetes.core.helm_repository:
+    name: "{{ helm_repo_name }}"
+    binary_path: "{{ helm_binary_path }}"
+    repo_url: "{{ helm_qudoor_chart_url }}"
+  ignore_errors: True
+
+- name: "{{ task_name }}"
+  kubernetes.core.helm:
+    name: qutrunk-{{ qutrunk_id }}
+    binary_path: "{{ helm_binary_path }}"
+    kubeconfig: "{{ kubeconfig_file }}"
+    chart_ref: "{{ helm_repo_name }}/qutrunk"
+    update_repo_cache: true
+    release_namespace: "{{ kubernetes_qutrunk_namespace }}"
+    values:
+      os: "{{ qutrunk_architecture }}"
+      qutrunk:
+        filename: "{{ qutrunk_filename }}"
+        url: "{{ qutrunk_url }}"
+        jobtimeout: "{{ qutrunk_jobtimeout }}"
+        retrycount: "{{ qutrunk_retrycount }}"
+        backend_type: "{{ BACKEND_TYPE }}"
+        aws_access_key_id: "{{ AWS_ACCESS_KEY_ID }}"
+        aws_secret_access_key: "{{ AWS_SECRET_ACCESS_KEY }}"
+        aws_default_region: "{{ AWS_DEFAULT_REGION }}"
+        backend_ip: ""
+        backend_port: ""
+      replicas: 1
+      resources:
+        limits:
+           cpu: "{{ qutrunk_cpu }}"
+           memory: "{{ qutrunk_memory }}"

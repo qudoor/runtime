@@ -1,0 +1,51 @@
+# SECURITY WARNING: keep the secret key used in production secret!
+# 加密密钥 生产环境中请修改为随机字符串，请勿外泄, 可使用命令生成
+# $ cat /dev/urandom | tr -dc A-Za-z0-9 | head -c 49;echo
+SECRET_KEY: django-insecure-35(5d7r6t2!pw0j2e81(s23xd$5r*6md3-t#ne:g@63:oc&3a7
+
+# DEBUG, INFO, WARNING, ERROR, CRITICAL can set. See https://docs.djangoproject.com/en/1.10/topics/logging/
+# 日志级别
+LOG_LEVEL: INFO
+
+# DEBUG 模式 开启DEBUG后遇到错误时可以看到更多日志
+DEBUG: true
+
+# 非常重要，修改后会便无法解密数据库中储存的主机密码，所以第一次生成后切勿再随意更改
+PWD_ENCRYPTION: "aa44c999apddapsapi1skfjkjdvnhjjj"
+
+# SQLite setting:
+# 使用单文件sqlite数据库
+# DB_ENGINE: sqlite3
+# DB_NAME:
+# MySQL or postgres setting like:
+# 使用Mysql作为数据库
+
+DB_HOST: mysql
+DB_PORT: 3306
+DB_USER: root
+DB_PASSWORD: "dev_qupot@123"
+DB_NAME: "qupot"
+
+
+# Use Redis as broker for celery and web socket
+# Redis配置
+REDIS_HOST: qupot_redis
+REDIS_PORT: 6379
+# REDIS_PASSWORD:
+# REDIS_DB_CELERY: 3
+# REDIS_DB_CACHE:
+
+# helm工具路径
+HELM_BINARY_PATH: "/opt/homebrew/bin/helm"
+# 应用商店使用的namespace
+APPSTORE_NAMESPACE: "qudoor-test"
+# Nexus 二进制存放位置
+# http://x.x.x.202:8081/repository/qudoor-raw/
+NEXUS_NAME: 'qudoor-raw'
+
+# 监听地址
+HTTP_HOST: '0.0.0.0'
+# QuPot端口
+HTTP_PORT: 9001
+WS_PORT: 9002
+FLOWER_PORT: 9003

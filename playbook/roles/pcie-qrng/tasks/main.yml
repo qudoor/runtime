@@ -1,0 +1,63 @@
+- block:
+
+    - name: install pcie-qrng tools (gcc gcc-c++ make)
+      yum:
+        name: "{{ item }}"
+        state: "present"
+      with_items:
+        - gcc
+        - gcc-c++
+        - make
+
+    - name: "Check pcie_qrng_package package"
+      stat:
+        path: "{{ base_dir }}/{{ pcie_qrng_package }}"
+      register: check_pcie_qrng_package
+
+    - name: "Determine if check_pcie_qrng_package is download"
+      set_fact:
+        pcie_qrng_package_download: "{{ check_pcie_qrng_package.stat.exists }}"
+
+    - name: Download pcie-qrng package
+      get_url:
+        validate_certs: no
+        url: "{{ pcie_qrng_download_url }}"
+        dest: "{{ base_dir }}/"
+        timeout: "{{ download_timeout_online }}"
+      when: not pcie_qrng_package_download
+
+    - name: backup old dir
+      shell:
+        "mv {{ base_dir }}/{{ pcie_qrng_name }} {{ base_dir }}/{{ pcie_qrng_name }}_backup"
+      ignore_errors: true
+
+    - name: Unarchive pcie-qrng package
+      unarchive:
+        src: "{{ base_dir }}/{{ pcie_qrng_package }}"
+        dest: "{{ base_dir }}"
+        remote_src: yes
+
+    - name: make
+      make:
+        chdir: "{{ base_dir }}/{{ pcie_qrng_name }}/Drivers/linux/driver"
+
+    - name: copy
+      shell:
+        "cp {{ base_dir }}/{{ pcie_qrng_name }}/Drivers/linux/etc/udev/rules.d/* /etc/udev/rules.d/"
+
+    - name: chmod +x load_driver.sh
+      shell:
+        "chmod +x {{ base_dir }}/{{ pcie_qrng_name }}/Drivers/linux/load_driver.sh"
+
+    - name: load driver
+      shell:
+        "bash {{ base_dir }}/{{ pcie_qrng_name }}/Drivers/linux/load_driver.sh"
+
+  when: ansible_distribution == 'Kylin Linux Advanced Server'
+
+# 系统不是 Kylin Linux Advanced Server 的
+- block:
+    - name: not support system
+      ansible.builtin.debug:
+        msg: "The system is not supported: {{ ansible_distribution }}"
+  when: ansible_distribution != 'Kylin Linux Advanced Server'

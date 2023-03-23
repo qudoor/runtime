@@ -1,0 +1,142 @@
+#!/usr/bin/env python3
+# coding: utf-8
+
+import argparse
+import logging
+import logging.handlers
+import os
+import sys
+import time
+
+import django
+from django.core import management
+from django.db.utils import OperationalError
+
+from QuPot.settings.base import TMP_DIR, K8S_CONFIG, STATIC_ROOT
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'QuPot.settings')
+django.setup()
+
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+
+
+def check_database_connection():
+    for i in range(60):
+        logging.info(f"Check database connection: {i}")
+        try:
+            management.call_command('check', '--database', 'default')
+            logging.info("Database connect success")
+            return
+        except OperationalError as e:
+            logging.error(e)
+            logging.info('Database not setup, retry')
+        except Exception as exc:
+            logging.error('Unexpect error occur: {}'.format(str(exc)))
+        time.sleep(1)
+    logging.error("Connection database failed, exit")
+    sys.exit(10)
+
+
+def collect_static():
+    logging.info("Collect static files")
+    try:
+        management.call_command('collectstatic', '--no-input', '-c', verbosity=0, interactive=False)
+        logging.info("Collect static files done")
+    except:
+        pass
+
+
+def upgrade_db():
+    perform_db_migrate()
+    load_fixtures_data()
+
+
+def load_fixtures_data():
+    logging.info("load fixtures data")
+    try:
+        management.call_command('init_runtime_app_data', 'fixtures/initial_data.json', app="runtime")
+    except:
+        logging.error("load fixtures data error")
+
+
+def perform_db_migrate():
+    logging.info("Check database structure change ...")
+    logging.info("Migrate model change to database ...")
+    try:
+        management.call_command('migrate')
+    except Exception:
+        logging.error('Perform migrate failed, exit', exc_info=True)
+        sys.exit(11)
+
+
+def check_dir():
+    if not os.path.exists(TMP_DIR):
+        os.mkdir(TMP_DIR)
+    if not os.path.exists(K8S_CONFIG):
+        os.mkdir(K8S_CONFIG)
+    if not os.path.exists(STATIC_ROOT):
+        os.mkdir(STATIC_ROOT)
+
+
+def prepare():
+    check_dir()
+    check_database_connection()
+    upgrade_db()
+    collect_static()
+
+
+def start_services():
+    services = args.services if isinstance(args.services, list) else [args.services]
+    if action == 'start' and {'all', 'web'} & set(services):
+        prepare()
+
+    start_args = []
+    if args.daemon:
+        start_args.append('--daemon')
+    if args.worker:
+        start_args.extend(['--worker', str(args.worker)])
+    if args.force:
+        start_args.append('--force')
+
+    try:
+        management.call_command(action, *services, *start_args)
+    except KeyboardInterrupt:
+        logging.info('Cancel ...')
+        time.sleep(2)
+    except Exception as exc:
+        logging.error("Start service error {}: {}".format(services, exc))
+        time.sleep(2)
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        description="""
+        QuPot service control tools;
+
+        Example: \r\n
+
+        %(prog)s start all -d;
+        """
+    )
+    parser.add_argument(
+        'action', type=str,
+        choices=("start", "stop", "restart", "status", "upgrade_db"),
+        help="Action to run"
+    )
+    parser.add_argument(
+        "services", type=str, default='all', nargs="*",
+        choices=("all", "web", "task"),
+        help="The service to start",
+    )
+    parser.add_argument('-d', '--daemon', nargs="?", const=True)
+    parser.add_argument('-w', '--worker', type=int, nargs="?", default=4)
+    parser.add_argument('-f', '--force', nargs="?", const=True)
+
+    args = parser.parse_args()
+    print("args: ", args.action)
+
+    action = args.action
+    if action == "upgrade_db":
+        upgrade_db()
+    else:
+        start_services()

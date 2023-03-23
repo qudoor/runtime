@@ -1,0 +1,7 @@
+- hosts:
+  - qupot-master
+  - qupot-worker
+  - new-worker
+  roles:
+  - ncard/nvidia
+

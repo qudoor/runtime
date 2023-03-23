@@ -1,0 +1,18 @@
+CheckHostSSHConnection = "CHECK_HOST_SSH_CONNECTION"
+CheckK8sToken = "CHECK_K8S_TOKEN"
+CheckK8sAPI = "CHECK_K8S_API"
+CheckK8sNodeStatus = "CHECK_K8S_NODE_STATUS"
+CheckKubeRouter = "CHECK_KUBE_ROUTER"
+
+StatusSuccess = "STATUS_SUCCESS"
+StatusWarning = "STATUS_WARNING"
+StatusFailed = "STATUS_FAILED"
+StatusError = "STATUS_ERROR"
+StatusSolvedManually = "STATUS_SOLVED_MANUALLY"
+StatusRecoverd = "STATUS_RECOVERD"
+
+RecoverNodeStatus = "RECOVER_SYNC_NODE_STATUS"
+RecoverSyncRouterIP = "RECOVER_SYNC_ROUTER_IP"
+RecoverSyncToken = "RECOVER_SYNC_TOKEN"
+RecoverHostConn = "RECOVER_HOST_CONN"
+RecoverAPIConn = "RECOVER_API_CONN"

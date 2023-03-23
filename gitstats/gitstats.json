@@ -1,0 +1,22 @@
+{
+  "url": "http://x.x.x.196",
+  "token": "7tWH5UT67pogzkjUXkzq",
+  "offset": 0,
+  "projects": [
+    {
+      "project_id": 90,
+      "users": [
+        "yangzhuohua@qudoor.cn",
+        "huangzonggui@qudoor.cn",
+        "chengshuang@qudoor.cn"
+      ],
+      "filetype": [
+        "py",
+        "xml"
+      ],
+      "branches": [
+        "dev-refactor"
+      ]
+    }
+  ]
+}

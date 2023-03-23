@@ -1,0 +1,28 @@
+[Centos-Base]
+name=CentOS Base
+baseurl={{ registry_protocol }}://{{ registry_hostname }}:{{repo_port}}/repository/centos-altarch/7/extras/$basearch/
+enabled=1
+gpgcheck=0
+protect=1
+
+[Centos-Extras]
+name=CentOS Extras
+baseurl={{ registry_protocol }}://{{ registry_hostname }}:{{repo_port}}/repository/centos-altarch/7/os/$basearch/
+enabled=1
+gpgcheck=0
+protect=1
+
+[Centos-epel]
+name=CentOS epel
+baseurl={{ registry_protocol }}://{{ registry_hostname }}:{{repo_port}}/repository/centos-epel/7/$basearch/
+enabled=1
+gpgcheck=0
+protect=1
+
+[updates]
+name=CentOS Updates
+baseurl={{ registry_protocol }}://{{ registry_hostname }}:{{repo_port}}/repository/centos-altarch/7/updates/$basearch/
+gpgcheck=0
+enabled=1
+protect=1
+

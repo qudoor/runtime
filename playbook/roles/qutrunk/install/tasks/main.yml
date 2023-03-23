@@ -1,0 +1,28 @@
+- name: ubuntu install qutrunk
+  include_tasks: install-ubuntu.yml
+  when: ansible_distribution == 'Ubuntu'
+
+#- name: centos install qutrunk
+#  include_tasks: install-centos.yml
+#  when: ansible_distribution == 'CentOS'
+
+- name: run pip install qutrunk packages
+  pip:
+    name: "{{ item }}"
+    extra_args: -i {{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-pypi/simple/ --trusted-host {{ dns_repository_hostname }} --timeout 600
+    executable: pip3
+    virtualenv_python: python3
+  when: processing_unit == 'CPU' or processing_unit == 'cpu' or processing_unit == 'Cpu'
+  with_items:
+    - qutrunk
+
+- name: run pip install qutrunk GPU packages
+  pip:
+    name: "{{ item }}"
+    extra_args: -i {{ registry_protocol }}://{{ dns_repository_hostname }}:{{ repo_port }}/repository/qudoor-pypi/simple/ --trusted-host {{ dns_repository_hostname }} --timeout 600
+    executable: pip3
+    virtualenv_python: python3
+  when: processing_unit == 'GPU' or processing_unit == 'gpu' or processing_unit == 'Gpu'
+  with_items:
+    - 'qutrunk[gpu]'
+    - 'numpy==1.21.6' # 版本对不上 无法运行 from numba import cuda 但不会报错

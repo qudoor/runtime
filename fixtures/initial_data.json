@@ -1,0 +1,223 @@
+[
+  {
+    "model": "runtime.runtimeappmodel",
+    "pk": "57073957-2736-428f-9df9-fafb5a6ec459",
+    "fields": {
+      "created_at": "2023-03-10T10:17:11.641",
+      "updated_at": "2023-03-10T10:17:11.654",
+      "name": "VQE",
+      "spec": {
+        "arch": [
+          "x86_64"
+        ],
+        "name": "VQE",
+        "version": "v1.0.0",
+        "playbooks": {
+          "CPU": [
+            "01-base-repository",
+            "02-base-env",
+            "03-base-nameserver",
+            "04-base-python",
+            "31-qusprout",
+            "20-qutrunk-install"
+          ],
+          "GPU": [
+            "01-base-repository",
+            "02-base-env",
+            "03-base-nameserver",
+            "04-base-python",
+            "31-qusprout",
+            "11-ncard-nvidia",
+            "12-ncard-cuda",
+            "13-ncard-cuquantum",
+            "14-ncard-quqcs",
+            "32-qusprout-gpu",
+            "20-qutrunk-install"
+          ]
+        },
+        "dependents": [
+          "python",
+          "cuda",
+          "nvidia",
+          "qusprout",
+          "qutrunk"
+        ],
+        "yum_operator": [
+          "replace",
+          "coexist",
+          "no"
+        ],
+        "support_processing_unit": [
+          "GPU",
+          "CPU"
+        ]
+      }
+    }
+  },
+  {
+    "model": "runtime.runtimeappmodel",
+    "pk": "648fd288-72d5-4bf6-9bb4-035ef310cabb",
+    "fields": {
+      "created_at": "2023-03-10T13:03:08.814",
+      "updated_at": "2023-03-10T13:03:08.829",
+      "name": "qutrunk",
+      "spec": {
+        "arch": [
+          "x86_64",
+          "arm64"
+        ],
+        "name": "qutrunk",
+        "version": "v1.0.0",
+        "playbooks": {
+          "default": [
+            "01-base-repository",
+            "02-base-env",
+            "03-base-nameserver",
+            "04-base-python",
+            "20-qutrunk-install"
+          ]
+        },
+        "dependents": [
+          "python"
+        ],
+        "yum_operator": [
+          "replace",
+          "coexist",
+          "no"
+        ],
+        "support_processing_unit": [
+          "CPU",
+          "GPU"
+        ]
+      }
+    }
+  },
+  {
+    "model": "runtime.runtimeappmodel",
+    "pk": "c71ce892-1545-4ed8-93f0-42b3e78ea9c9",
+    "fields": {
+      "created_at": "2023-03-22T22:30:05.044",
+      "updated_at": "2023-03-22T22:30:05.044",
+      "name": "00hello",
+      "spec": {
+        "arch": [
+          "x86_64"
+        ],
+        "name": "00hello",
+        "version": "v1.0.0",
+        "playbooks": {
+          "default": [
+            "00hello"
+          ]
+        },
+        "dependents": [
+          "python",
+          "cuda",
+          "nvidia"
+        ],
+        "yum_operator": [
+          "replace",
+          "coexist",
+          "no"
+        ],
+        "support_processing_unit": [
+          "GPU"
+        ]
+      }
+    }
+  },
+  {
+    "model": "runtime.runtimeappmodel",
+    "pk": "d0922942-ddd7-4dcd-8aab-e3369f6c990f",
+    "fields": {
+      "created_at": "2023-03-10T13:16:04.417",
+      "updated_at": "2023-03-10T13:16:04.417",
+      "name": "ncard",
+      "spec": {
+        "arch": [
+          "x86_64"
+        ],
+        "name": "ncard",
+        "version": "v1.0.0",
+        "playbooks": {
+          "default": [
+            "01-base-repository",
+            "02-base-env",
+            "03-base-nameserver",
+            "04-base-python",
+            "11-ncard-nvidia",
+            "12-ncard-cuda",
+            "13-ncard-cuquantum",
+            "14-ncard-quqcs"
+          ]
+        },
+        "dependents": [
+          "python",
+          "cuda",
+          "nvidia"
+        ],
+        "yum_operator": [
+          "replace",
+          "coexist",
+          "no"
+        ],
+        "support_processing_unit": [
+          "GPU"
+        ]
+      }
+    }
+  },
+  {
+    "model": "runtime.runtimeappmodel",
+    "pk": "f79d614c-a1ca-4780-a803-97fcca82da43",
+    "fields": {
+      "created_at": "2023-03-10T13:00:53.753",
+      "updated_at": "2023-03-10T13:00:53.753",
+      "name": "qusprout",
+      "spec": {
+        "arch": [
+          "x86_64",
+          "arm64"
+        ],
+        "name": "qusprout",
+        "version": "v1.0.0",
+        "playbooks": {
+          "CPU": [
+            "01-base-repository",
+            "02-base-env",
+            "03-base-nameserver",
+            "04-base-python",
+            "31-qusprout",
+            "20-qutrunk-install"
+          ],
+          "GPU": [
+            "01-base-repository",
+            "02-base-env",
+            "03-base-nameserver",
+            "04-base-python",
+            "31-qusprout",
+            "11-ncard-nvidia",
+            "12-ncard-cuda",
+            "13-ncard-cuquantum",
+            "14-ncard-quqcs",
+            "32-qusprout-gpu",
+            "20-qutrunk-install"
+          ]
+        },
+        "dependents": [
+          "python",
+          "qusprout"
+        ],
+        "yum_operator": [
+          "replace",
+          "coexist",
+          "no"
+        ],
+        "support_processing_unit": [
+          "CPU",
+          "GPU"
+        ]
+      }
+    }
+  }
+]

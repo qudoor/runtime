@@ -1,0 +1,21 @@
+- name: Install thirdparyt package
+  shell:
+    "bash install.sh"
+  args:
+    chdir: "{{ base_dir }}/qusprout/thirdparty/"
+
+- name: Build qusprout
+  shell:
+    "bash build_qusprout.sh version {{ qusprout_version }}"
+  args:
+    chdir: "{{ base_dir }}/qusprout/"
+    executable: /bin/bash
+
+- name: Deploy qusprout
+  shell:
+    "bash service_qusprout.sh version {{ qusprout_version }}"
+  args:
+    chdir: "{{ base_dir }}/qusprout/"
+    executable: /bin/bash
+
+

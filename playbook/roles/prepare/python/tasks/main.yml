@@ -1,0 +1,21 @@
+- name: check python version
+  shell: python3 -V 2>&1 | awk '{print $2}'
+  register: PYTHON_VERSION
+
+
+
+- name: ubuntu install cuquantum
+  include_tasks: install-ubuntu.yml
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - PYTHON_VERSION['stdout'] is version("3.8","lt") or PYTHON_VERSION['stdout'] == "python3:" # 小于：<, lt
+
+- name: centos install cuquantum
+  include_tasks: install-centos.yml
+  when:
+    - ansible_distribution == 'CentOS'
+    - PYTHON_VERSION['stdout'] is version("3.8","lt") or PYTHON_VERSION['stdout'] == "python3:" # 小于：<, lt
+
+
+
+

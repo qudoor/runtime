@@ -1,0 +1,151 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-01 18:08+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: apps/auth/user/authentications.py:18
+msgid "Token expired"
+msgstr "Token已过期"
+
+#: apps/auth/user/authentications.py:20
+msgid "Invalid token"
+msgstr "无效Token"
+
+#: apps/auth/user/authentications.py:27 apps/auth/user/serializers.py:25
+msgid "User not found"
+msgstr "用户未找到"
+
+#: apps/auth/user/authentications.py:30 apps/auth/user/serializers.py:46
+msgid "User inactive"
+msgstr "用户未激活"
+
+#: apps/auth/user/exceptions.py:19
+msgid "Bad Request (400)"
+msgstr "请求错误"
+
+#: apps/auth/user/exceptions.py:25
+msgid "Server error"
+msgstr "系统错误"
+
+#: apps/auth/user/models.py:12
+msgid "name"
+msgstr "姓名"
+
+#: apps/auth/user/models.py:19
+msgid "nickname"
+msgstr "昵称"
+
+#: apps/auth/user/models.py:26
+msgid "phone"
+msgstr "手机号"
+
+#: apps/auth/user/models.py:37
+msgid "user"
+msgstr "用户"
+
+#: apps/auth/user/models.py:38
+msgid "users"
+msgstr "用户名"
+
+#: apps/auth/user/serializers.py:43
+msgid "Password incorrect"
+msgstr "密码错误"
+
+#: apps/auth/user/serializers.py:87
+msgid "Old password"
+msgstr "旧密码"
+
+#: apps/auth/user/serializers.py:88
+msgid "New password"
+msgstr "新密码"
+
+#: apps/auth/user/serializers.py:92
+msgid "Two passwords must be equal"
+msgstr "两次密码不一致"
+
+#: apps/auth/user/views.py:33
+msgid "reset password"
+msgstr "重置密码"
+
+#: apps/auth/user/views.py:39
+msgid "No password"
+msgstr "未提供密码"
+
+#: apps/auth/user/views.py:61
+msgid "login"
+msgstr "登陆"
+
+#: apps/auth/user/views.py:78
+msgid "User Info"
+msgstr "用户信息"
+
+#: apps/auth/user/views.py:86
+msgid "Change Password"
+msgstr "修改密码"
+
+#: apps/auth/user/views.py:95
+msgid "Invalid original password"
+msgstr "密码错误"
+
+#: apps/common/db/fields.py:77
+msgid "Marshal dict data to char field"
+msgstr ""
+
+#: apps/common/db/fields.py:81
+msgid "Marshal dict data to text field"
+msgstr ""
+
+#: apps/common/db/fields.py:93
+msgid "Marshal list data to char field"
+msgstr ""
+
+#: apps/common/db/fields.py:97
+msgid "Marshal list data to text field"
+msgstr ""
+
+#: apps/common/db/fields.py:101
+msgid "Marshal data to char field"
+msgstr ""
+
+#: apps/common/db/fields.py:105
+msgid "Marshal data to text field"
+msgstr ""
+
+#: apps/common/documentation/openapi.py:17
+msgid "list"
+msgstr "列表"
+
+#: apps/common/documentation/openapi.py:18
+msgid "retrieve"
+msgstr "查询"
+
+#: apps/common/documentation/openapi.py:19
+msgid "create"
+msgstr "创建"
+
+#: apps/common/documentation/openapi.py:20
+msgid "update"
+msgstr "更新"
+
+#: apps/common/documentation/openapi.py:21
+msgid "partial update"
+msgstr "部分更新"
+
+#: apps/common/documentation/openapi.py:22
+msgid "destroy"
+msgstr "删除"

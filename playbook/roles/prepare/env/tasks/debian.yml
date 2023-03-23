@@ -1,0 +1,59 @@
+- name: Run "apt-get update"
+  shell: "sudo rm -rf /var/lib/apt/lists/* && sudo /usr/bin/apt-get update -y"
+  ignore_errors: true
+
+- name: Install Python-apt （'Ubuntu Magjor Version' = 18）
+  shell: "sudo /usr/bin/apt-get install python-apt -y"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_release == "bionic"
+  ignore_errors: true
+
+- name: Status firewalld
+  shell: >
+    systemctl status ufw | grep active || echo "not be found"
+  register: ufw_already_installed
+
+- name: Debian | Disable UFW
+  service:
+    name: ufw
+    state: stopped
+    enabled: no
+  when: '"active" in ufw_already_installed.stdout'
+  ignore_errors: true
+
+- name: Debian | Install base package
+  apt:
+    name:
+      - bash-completion
+      - psmisc
+      - rsync
+      - sshpass
+    state: latest
+
+
+- name: Disable rsyslog Get journald log 1
+  lineinfile:
+    dest: /etc/rsyslog.conf
+    state: present
+    regexp: 'ModLoad imjournal'
+    line: '#$ModLoad imjournal # provides access to the systemd journal'
+
+- name: Disable rsyslog Get journald log 2
+  lineinfile:
+    dest: /etc/rsyslog.conf
+    state: present
+    regexp: 'IMJournalStateFile'
+    line: '#$IMJournalStateFile imjournal.state'
+
+- name: Restart rsyslog service
+  service:
+    name: rsyslog
+    state: restarted
+  ignore_errors: true
+
+- name: Restarting Cron avoids job confusion caused by changing the time zone
+  service:
+    name: cron
+    state: restarted
+    enabled: yes

@@ -1,0 +1,11 @@
+__pycache__
+.history/
+.idea/
+version.txt
+/QuPot/data/
+/QuPot/tmp/
+/QuPot/static/
+/QuPot/logs
+config/config.yml
+static/
+tmp/

@@ -1,0 +1,8 @@
+- name: "{{ task_name }}"
+  kubernetes.core.k8s_info:
+    kubeconfig: "{{ kubeconfig_file }}"
+    namespace: "{{ kubernetes_qutrunk_namespace }}"
+    kind: Job
+#    label_selectors:
+#      - job-name = qutrunk-{{ qutrunk_id }}
+    name: qutrunk-{{ qutrunk_id }}

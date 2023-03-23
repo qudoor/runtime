@@ -1,0 +1,92 @@
+---
+- name: Yum  lspci
+  yum:
+    name: "pciutils"
+    state: "present"
+  when: ansible_distribution == 'CentOS'
+
+- name: Check for NVIDIA GPU
+  shell: lspci | grep -i nvidia
+  register: nvidia_check
+  failed_when: nvidia_check.rc != 0
+
+- name: Is Install nvidia
+  shell: nvidia-smi |grep -q "Driver Version:" || echo "NVIDIA drivers not installed"
+  register: IS_NVIDIA_INSTALL
+
+
+- block:
+    - name: ubuntu install depend
+      include_tasks: install-ubuntu.yml
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: centos install package
+      include_tasks: install-centos.yml
+      when: ansible_distribution == 'CentOS'
+
+    - name: "Check nvidia package"
+      stat:
+        path: "{{ base_dir }}/{{ nvidia_name }}-{{ nvidia_version }}.run"
+      register: check_nvidia_package
+
+    - name: "Check nvidia driver  download"
+      set_fact:
+        nvidia_package_download: "{{ check_nvidia_package.stat.exists }}"
+
+    - name: download nvidia drive binaries
+      get_url:
+        validate_certs: no
+        url: "{{ nvidia_download_url }}"
+        dest: "{{ base_dir }}/"
+        timeout: "{{ download_timeout_online }}"
+      when: not nvidia_package_download
+
+    - name: delete nouveau
+      modprobe: name=nouveau   state=absent
+      ignore_errors: True
+
+    - name: add blacklist.conf
+      blockinfile:
+        path: /etc/modprobe.d/blacklist.conf
+        block: |
+          blacklist rivafb
+          blacklist vga16fb
+          blacklist nouveau
+          blacklist nvidiafb
+          blacklist rivatv
+          options nouveau modeset=0
+          blacklist lbm-nouveau
+          alias nouveau off
+          alias lbm-nouveau off
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+
+    - name: run update-initramfs -u
+      shell: echo options nouveau modeset=0 | sudo tee -a /etc/modprobe.d/nouveau-kms.conf && update-initramfs -u
+      when: ansible_distribution == 'Ubuntu'
+
+    - name: run NVIDIA-Linux-xxx.run
+      shell:
+        cmd: "bash {{ base_dir }}/{{ nvidia_name }}-{{ nvidia_version }}.run --accept-license --silent --no-nouveau-check --disable-nouveau --no-opengl-files --no-x-check"
+        creates: /tmp/install-nvidia-ok
+
+    - name: reboot server
+      reboot:
+        test_command: uptime
+        reboot_timeout: 3600
+
+    - name: Check the smi of the servers
+      shell: "nvidia-smi"
+      register: smi
+
+    - debug: var=smi
+  when: IS_NVIDIA_INSTALL.stdout == "NVIDIA drivers not installed"
+
+- name: Verify NVIDIA driver installation
+  shell: "nvidia-smi"
+  register: smi
+  when: nvidia_check.rc == 0
+
+- name: Show NVIDIA GPU model
+  debug:
+    msg: "{{ smi.stdout_lines[2].split()[2] }}"
+  when: nvidia_check.rc == 0

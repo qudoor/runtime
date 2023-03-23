@@ -1,0 +1,19 @@
+stages:
+  - dev-deploy
+
+
+docker_build:
+   stage: dev-deploy
+   only:
+     - dev-refactor
+   script:
+     - QUPOT_VERSION=$(task record_version)
+     - echo $QUPOT_VERSION
+     - task docker_build
+     - task docker_login
+     - task docker_push
+     - ansible 212 -e QUPOT_VERSION=$QUPOT_VERSION -m replace -a 'path=/opt/qupot/qupot.conf regexp="(QU_TAG=)(.*)" replace=QU_TAG={{ QUPOT_VERSION }}'
+     - ansible 212 -m replace -a 'path=/opt/qupot/qupot.conf regexp="(QUPOT_ENV=)(.*)" replace=QUPOT_ENV=dev'
+     - ansible 212 -m command -a "quctl pull"
+     - ansible 212 -m command -a "quctl restart"
+

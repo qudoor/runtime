@@ -1,0 +1,14 @@
+- name: install ubuntu
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - git
+    - wget
+    - gcc
+    - g++
+    - make
+    - unzip
+    - python-dev-is-python3
+    - patch
+    - net-tools

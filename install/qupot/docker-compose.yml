@@ -1,0 +1,85 @@
+version: "2.2"
+services:
+
+  ui:
+    image: registry.queco.cn/repository/qudoor/ui:${UI_TAG}-${OS_ARCH}
+    container_name: qupot_ui
+    restart: always
+    ports:
+      - "9080:80"
+    healthcheck:
+      test: [ "CMD", "test", "-f", "/var/run/nginx.pid" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  mysql:
+    image: registry.queco.cn/repository/qudoor/mysql-server:8.0.32-${OS_ARCH}
+    container_name: qupot_mysql
+    restart: always
+    ports:
+      - 3306:3306
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+    volumes:
+      - ./conf/my.cnf:/etc/my.cnf
+      - ./data/mysql:/var/lib/mysql
+
+  nexus:
+    restart: always
+    image: registry.queco.cn/repository/qudoor/nexus:3.43.0-${OS_ARCH}
+    container_name: qupot_nexus
+    ports:
+      - ${QU_REPO_PORT}:8081
+      - ${QU_REGISTRY_PORT}:8082
+      - ${QU_REGISTRY_HOSTED_PORT}:8083
+      - ${QU_REGISTRY_CHART_PORT}:8084
+    volumes:
+      - ./data/nexus-data/:/nexus-data
+    healthcheck:
+      test: [ "CMD","curl","localhost:8081" ]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  ##
+  qupot-redis:
+    image: registry.queco.cn/repository/qudoor/redis:5-${OS_ARCH}
+    container_name: qupot_redis
+    restart: always
+    #  ports:
+    #  - "6379:6379"
+    volumes:
+      - ./conf/redis.conf:/etc/redis/redis.conf
+      - ./data/redis/:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  ##qupot
+  qupot:
+    image: registry.queco.cn/repository/qudoor/qupot:${QU_TAG}-${OS_ARCH}
+    container_name: qupot
+    restart: always
+    #command: python qpt start
+    volumes:
+      - ./data/qupot/logs:/QuPot/logs
+      - ./data/qupot/data:/QuPot/data
+      - ./conf/config.yml:/QuPot/config/config.yml
+    ports:
+      - "9001:9001"
+      #flower
+      - "9003:9003"
+    depends_on:
+      - qupot-redis
+      - mysql
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9001/health_check/" ]
+      interval: 30s
+      timeout: 30s
+      retries: 5
