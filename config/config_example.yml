@@ -23,7 +23,7 @@ PWD_ENCRYPTION: "aa44c999apddapsapi1skfjkjdvnhjjj"
 DB_HOST: mysql
 DB_PORT: 3306
 DB_USER: root
-DB_PASSWORD: "dev_qupot@123"
+DB_PASSWORD: ""
 DB_NAME: "qupot"
 
 

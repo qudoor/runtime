@@ -1,0 +1,40 @@
+version: '3'
+
+vars:
+
+  GIT_COMMIT:
+    sh: git log -n 1 --format=%h
+  VERSION: "v1.1.0-{{.GIT_COMMIT}}"
+  REGISTRY: registry.queco.cn
+  IMAGE_NAME:  "{{ .REGISTRY }}/repository/qudoor/ui:{{ .VERSION }}-{{if eq ARCH \"arm64\"}}arm64{{else}}amd64{{end}}"
+
+tasks:
+  build:
+    cmds:
+      - echo '{{ .VERSION }}'
+
+  record_version:
+    cmds:
+      - echo '{{ .VERSION }}'
+
+  generate_version:
+    cmds:
+      - jq --arg ver '{{ .VERSION }}' '.version = $ver' public/version.json > public/version_new.json
+      - mv -f public/version_new.json public/version.json
+
+  docker:
+    cmds:
+      - task: generate_version
+      - echo "build ui docker version:" {{ .VERSION }}
+      - docker build -t {{ .IMAGE_NAME }} . --no-cache
+
+  docker_push:
+    vars:
+      USER: "admin"
+      PASSWORD: "'123456'"
+    cmds:
+      - task: record_version
+      - task: docker
+      - docker login {{ .REGISTRY }} -u {{ .USER }} -p {{ .PASSWORD }}
+      - docker push {{ .IMAGE_NAME }}
+      - echo "push {{ .IMAGE_NAME }}  complete"

@@ -39,7 +39,7 @@ class Playbook(JsonWebsocketConsumer):
                 'ip': '124.71.30.220',
                 'port': 22,
                 'user': 'root',
-                'password': '1qa2ws#ED',
+                'password': '123456',
                 # 'private_key': all_of_it,
                 'groups': ['master', 'test'],
             }

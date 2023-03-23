@@ -1,0 +1,17 @@
+stages:
+  - deploy
+  
+
+
+docker_build:
+  stage: deploy
+  only:
+  - dev
+  script:
+    - UI_VERSION=$(task record_version)
+    - echo $UI_VERSION
+    - task docker_push
+    - ansible 212 -e UI_VERSION=$UI_VERSION -m replace -a 'path=/opt/qupot/qupot.conf regexp="(UI_TAG=)(.*)" replace=UI_TAG={{ UI_VERSION }}'
+    - ansible 212 -m command -a "quctl pull"
+    - ansible 212 -m command -a "quctl restart"
+

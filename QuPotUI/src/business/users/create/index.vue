@@ -1,0 +1,109 @@
+<template>
+  <layout-content :header="$t('commons.button.create')" :back-to="{ name: 'UserList' }">
+    <el-row>
+      <el-col :span="4"><br /></el-col>
+      <el-col :span="10">
+        <div class="grid-content bg-purple-light">
+          <el-form ref="form" :model="form" :rules="rules" label-width="150px" label-position="left">
+            <el-form-item :label="$t('commons.table.name')" prop="username">
+              <el-input v-model="form.username"></el-input>
+              <div><span class="input-help">{{ $t('commons.validate.name_help') }}</span></div>
+            </el-form-item>
+            <el-form-item :label="$t('user.email')" prop="email">
+              <el-input type="email" v-model="form.email"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('user.password')" prop="password">
+              <el-input type="password" v-model="form.password"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('user.confirm_password')" prop="confirmPassword">
+              <el-input type="password" v-model="form.confirmPassword"></el-input>
+            </el-form-item>
+            <!-- <el-form-item v-if="currentUser.isSuperuser" :label="$t('user.role')" prop="role">
+              <el-radio-group v-model="form.role">
+                <el-radio label="admin">{{ $t("commons.role.admin") }}</el-radio>
+                <el-radio label="user">{{ $t("commons.role.user") }}</el-radio>
+              </el-radio-group>
+            </el-form-item> -->
+            <el-form-item>
+              <div style="float: right">
+                <el-button @click="onCancel()">{{ $t("commons.button.cancel") }}</el-button>
+                <el-button type="primary" @click="onSubmit('form')" v-preventReClick>{{ $t("commons.button.submit")
+                }}</el-button>
+              </div>
+            </el-form-item>
+          </el-form>
+        </div>
+      </el-col>
+      <el-col :span="4"><br /></el-col>
+    </el-row>
+  </layout-content>
+</template>
+
+<script>
+import LayoutContent from "@/components/layout/LayoutContent"
+import { createUser } from "@/api/user"
+// import { getCurrentUser } from "@/api/user-token"
+import Rule from "@/utils/rules"
+
+export default {
+  name: "UserCreate",
+  components: { LayoutContent },
+  data() {
+    return {
+      form: {
+        username: "",
+        password: "",
+        confirmPassword: "",
+        role: "user",
+      },
+      rules: {
+        username: [Rule.ClusterNameRule, Rule.RequiredRule],
+        email: [Rule.EmailRule, Rule.RequiredRule],
+        password: [Rule.RequiredRule, Rule.PasswordRule],
+        confirmPassword: [Rule.RequiredRule, Rule.PasswordRule, {
+          validator: this.checkPassword, trigger: "blur"
+        }],
+        role: [Rule.RequiredRule],
+      },
+      // currentUser: {},
+    }
+  },
+  methods: {
+    onSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (!valid) {
+          return false
+        }
+        createUser({
+          username: this.form.username,
+          password: this.form.password,
+          email: this.form.email,
+          role: this.form.role,
+        }).then(() => {
+          this.$message({
+            type: "success",
+            message: this.$t("commons.msg.create_success"),
+          })
+          this.$router.push({ name: "UserList" })
+        })
+      })
+    },
+    onCancel() {
+      this.$router.push({ name: "UserList" })
+    },
+    checkPassword(rule, value, callback) {
+      if (this.form.password !== this.form.confirmPassword) {
+        return callback(new Error(this.$t("commons.personal.confirm_password1_info")))
+      }
+      callback()
+    },
+  },
+  created() {
+    // getCurrentUser().then(res => {
+    //   this.currentUser = res
+    // })
+  }
+}
+</script>
+
+<style scoped></style>

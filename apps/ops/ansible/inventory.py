@@ -119,10 +119,6 @@ class BaseInventory(InventoryManager):
 
     def parse_hosts(self, cache=False):
         # 循环主机列表
-        # {'ip': 'x.x.x.212', 'name': 'test-211-212-01-worker-1', 'port': 22, 'user': 'root',
-        #  'password': '1qa2ws#ED', 'vars': {'architectures': 'amd64', 'has_gpu': 'false', 'registry_hosted_port': '8083',
-        #                                    'registry_hostname': 'x.x.x.202', 'registry_port': '8082',
-        #                                    'registry_protocol': 'http', 'repo_port': '8081'}}
         group_all = self.get_group('all')
         ungrouped = self.get_group('ungrouped')
         for host_data in self.host_list:
